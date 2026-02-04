@@ -1,0 +1,36 @@
+name: Manga Auto Scraper
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # تشغيل تلقائي كل 6 ساعات
+  workflow_dispatch: # زر للتشغيل اليدوي
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Libraries
+        run: pip install cloudscraper beautifulsoup4
+
+      - name: Run Scraper
+        run: python scraper.py
+
+      - name: Commit and Push Data
+        run: |
+          git config --global user.name "KazoBot"
+          git config --global user.email "bot@github.com"
+          git add data.json
+          git commit -m "Auto Update Manga" || echo "No changes to commit"
+          git push
+
